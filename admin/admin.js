@@ -129,7 +129,10 @@
     if (event.cover_image) {
       const image = document.createElement("img");
       image.className = "event-thumb";
-      image.src = new URL(event.cover_image, window.EVENTS_ASSETS_BASE_URL).href;
+      const imageBaseUrl = event.cover_image.startsWith("assets/uploads/events/")
+        ? window.EVENTS_UPLOADS_BASE_URL
+        : window.EVENTS_ASSETS_BASE_URL;
+      image.src = new URL(event.cover_image, imageBaseUrl).href;
       image.alt = "";
       image.loading = "lazy";
       image.addEventListener("error", () => {

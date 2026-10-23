@@ -27,7 +27,10 @@
   }
 
   function eventImageUrl(path) {
-    return new URL(path, window.EVENTS_ASSETS_BASE_URL).href;
+    const baseUrl = path.startsWith("assets/uploads/events/")
+      ? window.EVENTS_UPLOADS_BASE_URL
+      : window.EVENTS_ASSETS_BASE_URL;
+    return new URL(path, baseUrl).href;
   }
 
   function renderEvent(event) {

@@ -22,13 +22,14 @@ By default, the frontend uses the same-origin API path. To host the API separate
 
    The current value `https://api.leadstar.com.ng/samchuks/` therefore requests `https://api.leadstar.com.ng/samchuks/events.php`. If `/samchuks` is the deployed project root and the PHP files remain in its `api` subfolder, use `https://api.leadstar.com.ng/samchuks/api/` instead. Use the shorter value only if the host or rewrite rules expose the PHP endpoints directly under `/samchuks/`.
 
-2. Set `window.EVENTS_ASSETS_BASE_URL` in the same file to the public project asset root, with a trailing slash. It is configured separately so image files can be served from the API host even if the API endpoints use a different path:
+2. Set `window.EVENTS_ASSETS_BASE_URL` in the same file to the public website's asset root, with a trailing slash. Set `window.EVENTS_UPLOADS_BASE_URL` to the API host's project root where PHP writes uploaded files:
 
    ```js
-   window.EVENTS_ASSETS_BASE_URL = "https://api.leadstar.com.ng/samchuks/";
+   window.EVENTS_ASSETS_BASE_URL = "https://samchuksfoundation.com/";
+   window.EVENTS_UPLOADS_BASE_URL = "https://api.leadstar.com.ng/samchuks/";
    ```
 
-   Seed records keep portable relative paths such as `assets/img/new/orph.jpeg`; the pages resolve them to `https://api.leadstar.com.ng/samchuks/assets/img/new/orph.jpeg`. New admin uploads are written by PHP to `<project-root>/assets/uploads/events/` and their returned relative paths resolve to `https://api.leadstar.com.ng/samchuks/assets/uploads/events/<filename>`. Ensure that directory is writable by PHP and publicly serves images.
+   Seed records keep portable relative paths such as `assets/img/new/orph.jpeg`; the pages resolve them to `https://samchuksfoundation.com/assets/img/new/orph.jpeg`. New admin uploads are written by PHP to `<API-project-root>/assets/uploads/events/` and their returned relative paths resolve to `https://api.leadstar.com.ng/samchuks/assets/uploads/events/<filename>`. Ensure that directory is writable by PHP and publicly serves images.
 
 3. In the API host's `api/config.local.php`, set `cors_origins` to the exact origin(s) of the public site and admin UI. Include scheme and port if non-default; do not include a path or trailing slash:
 
