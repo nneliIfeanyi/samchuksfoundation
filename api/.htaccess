@@ -1,0 +1,3 @@
+<FilesMatch "^(config\.local\.php|config\.local\.php\.example|schema\.sql|seed-events\.sql|SETUP\.md)$">
+    Require all denied
+</FilesMatch>

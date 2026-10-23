@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7fb">
+  <title>Events workspace | Samchuks Empowerment Foundation</title>
+  <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="admin.css" rel="stylesheet">
+</head>
+<body class="admin-body">
+  <section id="login-screen" class="login-screen d-none" aria-labelledby="login-title">
+    <div class="login-brand">
+      <span class="brand-mark"><i class="bi bi-heart-pulse-fill"></i></span>
+      <span>Samchuks <strong>Foundation</strong></span>
+    </div>
+    <div class="login-card">
+      <span class="eyebrow">ADMINISTRATOR PORTAL</span>
+      <h1 id="login-title">Welcome back</h1>
+      <p class="login-intro">Sign in to manage your foundation's events and programmes.</p>
+      <form id="login-form">
+        <label class="form-label" for="login-email">Email address</label>
+        <div class="input-icon-wrap mb-3">
+          <i class="bi bi-envelope"></i>
+          <input class="form-control" id="login-email" type="email" autocomplete="username" placeholder="you@example.com" required>
+        </div>
+        <label class="form-label" for="login-password">Password</label>
+        <div class="input-icon-wrap mb-4">
+          <i class="bi bi-lock"></i>
+          <input class="form-control" id="login-password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+        </div>
+        <button class="btn btn-primary w-100 login-submit" type="submit">
+          <span>Sign in to workspace</span><i class="bi bi-arrow-right"></i>
+        </button>
+      </form>
+      <a class="login-back-link" href="../index.html"><i class="bi bi-arrow-left"></i> Back to foundation website</a>
+    </div>
+    <p class="login-footnote"><i class="bi bi-shield-check"></i> Secure administrator access</p>
+  </section>
+
+  <div id="admin-app" class="admin-app d-none">
+    <header class="topbar">
+      <div class="topbar-brand">
+        <button id="sidebar-toggle" class="icon-button sidebar-toggle" type="button" aria-label="Open navigation" aria-controls="admin-sidebar" aria-expanded="false">
+          <i class="bi bi-list"></i>
+        </button>
+        <a class="brand-link" href="../index.html" aria-label="Samchuks Foundation home">
+          <span class="brand-mark"><i class="bi bi-heart-pulse-fill"></i></span>
+          <span class="brand-name">Samchuks <strong>Foundation</strong></span>
+        </a>
+      </div>
+      <div class="topbar-actions">
+        <a class="website-link" href="../index.html" target="_blank" rel="noopener"><i class="bi bi-box-arrow-up-right"></i><span>View website</span></a>
+        <span class="topbar-divider"></span>
+        <span class="admin-avatar" aria-hidden="true"><i class="bi bi-person"></i></span>
+        <span id="admin-email" class="admin-email">Administrator</span>
+        <button id="logout-button" class="btn btn-light logout-button" type="button"><i class="bi bi-box-arrow-right"></i><span>Sign out</span></button>
+      </div>
+    </header>
+
+    <div class="admin-layout">
+      <div id="sidebar-overlay" class="sidebar-overlay"></div>
+      <aside id="admin-sidebar" class="sidebar" aria-label="Main navigation">
+        <div class="sidebar-label">WORKSPACE</div>
+        <nav class="sidebar-nav">
+          <a class="sidebar-link" href="#overview">
+            <i class="bi bi-grid-1x2"></i><span>Overview</span>
+          </a>
+          <a class="sidebar-link active" href="#events" aria-current="page">
+            <i class="bi bi-calendar-event"></i><span>Events</span><span id="nav-event-count" class="nav-count">0</span>
+          </a>
+        </nav>
+        <div class="sidebar-spacer"></div>
+        <div class="sidebar-tip">
+          <span class="tip-icon"><i class="bi bi-lightbulb"></i></span>
+          <strong>Quick tip</strong>
+          <p>Feature an event to highlight it on your homepage.</p>
+        </div>
+        <a class="sidebar-site-link" href="../index.html" target="_blank" rel="noopener">
+          <i class="bi bi-globe2"></i><span>Open public website</span><i class="bi bi-arrow-up-right ms-auto"></i>
+        </a>
+        <div class="sidebar-footer">Samchuks Empowerment Foundation</div>
+      </aside>
+
+      <main id="dashboard" class="workspace">
+        <section id="overview" class="welcome-row">
+          <div>
+            <div class="breadcrumb-label"><span>Workspace</span><i class="bi bi-chevron-right"></i><strong>Events</strong></div>
+            <h1>Events</h1>
+            <p class="page-subtitle">Create, organize, and publish your foundation's programmes.</p>
+          </div>
+          <button id="new-event-button" class="btn btn-primary add-event-button" type="button">
+            <i class="bi bi-plus-lg"></i><span>Add new event</span>
+          </button>
+        </section>
+
+        <section class="stats-grid" aria-label="Event summary">
+          <article class="stat-card">
+            <span class="stat-icon stat-icon-blue"><i class="bi bi-calendar2-week"></i></span>
+            <div><span class="stat-label">Total events</span><strong id="stat-total" class="stat-value">—</strong></div>
+            <span class="stat-note">In your workspace</span>
+          </article>
+          <article class="stat-card">
+            <span class="stat-icon stat-icon-green"><i class="bi bi-check2-circle"></i></span>
+            <div><span class="stat-label">Published</span><strong id="stat-published" class="stat-value">—</strong></div>
+            <span class="stat-note">Visible to everyone</span>
+          </article>
+          <article class="stat-card">
+            <span class="stat-icon stat-icon-amber"><i class="bi bi-file-earmark"></i></span>
+            <div><span class="stat-label">Drafts</span><strong id="stat-drafts" class="stat-value">—</strong></div>
+            <span class="stat-note">Not published yet</span>
+          </article>
+        </section>
+
+        <section id="events" class="events-card" aria-labelledby="events-heading">
+          <div class="events-card-header">
+            <div>
+              <h2 id="events-heading">All events</h2>
+              <p>Manage the details and visibility of your programmes.</p>
+            </div>
+            <span id="results-count" class="results-count">Loading events…</span>
+          </div>
+          <div class="table-toolbar">
+            <label class="search-box" for="event-search">
+              <i class="bi bi-search"></i>
+              <input id="event-search" type="search" placeholder="Search events..." autocomplete="off">
+              <kbd>/</kbd>
+            </label>
+            <label class="filter-select-wrap" for="status-filter">
+              <i class="bi bi-funnel"></i>
+              <select id="status-filter" class="form-select" aria-label="Filter events by status">
+                <option value="all">All statuses</option>
+                <option value="published">Published</option>
+                <option value="draft">Draft</option>
+              </select>
+            </label>
+          </div>
+          <div class="table-responsive">
+            <table class="table event-table align-middle">
+              <thead>
+                <tr>
+                  <th scope="col">Event</th>
+                  <th scope="col">Category</th>
+                  <th scope="col">Schedule</th>
+                  <th scope="col">Visibility</th>
+                  <th scope="col" class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="events-table-body">
+                <tr><td colspan="5"><div class="table-loading"><span class="loading-spinner"></span>Loading your events…</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-footer">
+            <span id="table-summary">Your event records</span>
+            <span><i class="bi bi-arrow-repeat"></i> Changes save to your database</span>
+          </div>
+        </section>
+        <footer class="workspace-footer">© <span id="current-year"></span> Samchuks Empowerment Foundation</footer>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="event-dialog" class="event-dialog" aria-labelledby="form-heading">
+    <div class="dialog-header">
+      <div>
+        <span class="eyebrow">EVENT DETAILS</span>
+        <h2 id="form-heading">Create an event</h2>
+        <p>Fill in the information you want visitors to see.</p>
+      </div>
+      <button id="close-dialog-button" class="icon-button dialog-close" type="button" aria-label="Close editor"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <form id="event-form">
+      <input id="event-id" type="hidden">
+      <div class="dialog-form-content">
+        <div class="form-section-title"><span>01</span><strong>Event information</strong></div>
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label class="form-label" for="title">Event title <span class="required-mark">*</span></label>
+            <input class="form-control" id="title" maxlength="180" placeholder="e.g. Community Outreach Programme" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="slug">URL slug <span class="required-mark">*</span></label>
+            <input class="form-control" id="slug" maxlength="180" placeholder="community-outreach" required>
+            <div class="form-hint">Used in the event page URL.</div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="category">Category <span class="required-mark">*</span></label>
+            <input class="form-control" id="category" maxlength="120" placeholder="Community Outreach" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="event-date">Event date</label>
+            <input class="form-control" id="event-date" type="date">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="programme-year">Programme period</label>
+            <input class="form-control" id="programme-year" placeholder="e.g. 2025">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="participants">Participants</label>
+            <input class="form-control" id="participants" placeholder="e.g. 50 beneficiaries">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="duration">Duration</label>
+            <input class="form-control" id="duration" placeholder="e.g. 6 months">
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="description">Description <span class="required-mark">*</span></label>
+            <textarea class="form-control" id="description" rows="5" placeholder="Tell visitors about this programme..." required></textarea>
+          </div>
+        </div>
+
+        <div class="form-section-title form-section-spaced"><span>02</span><strong>Event imagery</strong></div>
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label" for="cover-image">Cover image path</label>
+            <input class="form-control" id="cover-image" placeholder="assets/uploads/events/your-image.jpg">
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="gallery">Gallery image paths</label>
+            <textarea class="form-control" id="gallery" rows="2" placeholder="Add one local image path per line"></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="image-upload">Upload images</label>
+            <div class="upload-row">
+              <input class="form-control" id="image-upload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
+              <button id="upload-button" class="btn btn-light upload-button" type="button"><i class="bi bi-cloud-arrow-up"></i><span>Upload</span></button>
+            </div>
+            <div class="form-hint">JPEG, PNG, WebP, or GIF. Maximum 5 MB per image.</div>
+          </div>
+        </div>
+
+        <div class="form-section-title form-section-spaced"><span>03</span><strong>Publishing</strong></div>
+        <div class="publishing-options">
+          <div class="publishing-field">
+            <label class="form-label" for="status">Visibility</label>
+            <select class="form-select" id="status">
+              <option value="draft">Draft — only visible to admins</option>
+              <option value="published">Published — visible on the website</option>
+            </select>
+          </div>
+          <label class="featured-toggle" for="featured">
+            <input class="form-check-input" id="featured" type="checkbox">
+            <span><strong>Feature on homepage</strong><small>Highlight this event on the landing page.</small></span>
+          </label>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button id="cancel-event-button" class="btn btn-light" type="button">Cancel</button>
+        <button id="save-event-button" class="btn btn-primary save-event-button" type="submit"><i class="bi bi-check2"></i><span>Save event</span></button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast-region" class="toast-region" role="status" aria-live="polite" aria-atomic="false"></div>
+  <script src="../assets/js/api-config.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
