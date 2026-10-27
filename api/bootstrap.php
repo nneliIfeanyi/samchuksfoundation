@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+const MAX_EVENT_IMAGES = 4;
+
 function json_response(array $body, int $status = 200): never
 {
     http_response_code($status);
@@ -163,6 +165,12 @@ function clean_event_payload(array $input): array
         str_contains($cover, '\\') ||
         !preg_match('#^assets/(?:img/[a-zA-Z0-9._/-]+|uploads/events/[a-zA-Z0-9._/-]+)$#', $cover))) {
         json_response(['error' => 'Cover image must point to a local image.'], 422);
+    }
+    $eventImages = array_values(array_unique(array_filter([$cover, ...$images])));
+    if (count($eventImages) > MAX_EVENT_IMAGES) {
+        json_response([
+            'error' => 'Each event can have no more than ' . MAX_EVENT_IMAGES . ' images, including the cover.',
+        ], 422);
     }
 
     return [

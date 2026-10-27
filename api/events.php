@@ -24,7 +24,7 @@ if (($_GET['featured'] ?? '') === '1') {
 $limit = filter_var($_GET['limit'] ?? null, FILTER_VALIDATE_INT);
 $limit = $limit === false || $limit === null ? 0 : max(1, min(50, $limit));
 $sql = 'SELECT id, title, slug, category, description, event_date, programme_year, participants, duration, cover_image, gallery_json, status, featured, created_at, updated_at FROM events '
-    . $where . ' ORDER BY COALESCE(event_date, created_at) DESC, id DESC';
+    . $where . ' ORDER BY updated_at DESC, id DESC';
 if ($limit > 0) {
     $sql .= ' LIMIT ' . $limit;
 }

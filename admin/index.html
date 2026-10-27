@@ -220,14 +220,17 @@
           <div class="col-12">
             <label class="form-label" for="gallery">Gallery image paths</label>
             <textarea class="form-control" id="gallery" rows="2" placeholder="Add one local image path per line"></textarea>
+            <div class="form-hint">Maximum 4 unique images per event, including the cover image.</div>
           </div>
           <div class="col-12">
             <label class="form-label" for="image-upload">Upload images</label>
             <div class="upload-row">
-              <input class="form-control" id="image-upload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
+              <input class="form-control" id="image-upload" type="file" accept="image/jpeg,image/png,image/webp" multiple>
               <button id="upload-button" class="btn btn-light upload-button" type="button"><i class="bi bi-cloud-arrow-up"></i><span>Upload</span></button>
             </div>
-            <div class="form-hint">JPEG, PNG, WebP, or GIF. Maximum 5 MB per image.</div>
+            <div class="form-hint">JPEG, PNG, or WebP. Maximum 5 MB each; saved as 1600 x 1200 WebP images.</div>
+            <div id="image-preview-grid" class="image-preview-grid" aria-live="polite"></div>
+            <div id="image-count-status" class="form-hint" aria-live="polite"></div>
           </div>
         </div>
 
@@ -251,6 +254,18 @@
         <button id="save-event-button" class="btn btn-primary save-event-button" type="submit"><i class="bi bi-check2"></i><span>Save event</span></button>
       </div>
     </form>
+  </dialog>
+
+  <dialog id="preview-dialog" class="event-dialog event-preview-dialog" aria-labelledby="preview-heading">
+    <div class="dialog-header">
+      <div>
+        <span id="preview-status" class="status-pill status-draft">Draft — admin preview</span>
+        <h2 id="preview-heading">Event preview</h2>
+        <p>This preview is private and does not publish the event.</p>
+      </div>
+      <button id="close-preview-button" class="icon-button dialog-close" type="button" aria-label="Close preview"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div id="event-preview-content" class="event-preview-content"></div>
   </dialog>
 
   <div id="toast-region" class="toast-region" role="status" aria-live="polite" aria-atomic="false"></div>

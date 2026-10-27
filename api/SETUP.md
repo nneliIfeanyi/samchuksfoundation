@@ -29,7 +29,7 @@ By default, the frontend uses the same-origin API path. To host the API separate
    window.EVENTS_UPLOADS_BASE_URL = "https://api.leadstar.com.ng/samchuks/";
    ```
 
-   Seed records keep portable relative paths such as `assets/img/new/orph.jpeg`; the pages resolve them to `https://samchuksfoundation.com/assets/img/new/orph.jpeg`. New admin uploads are written by PHP to `<API-project-root>/assets/uploads/events/` and their returned relative paths resolve to `https://api.leadstar.com.ng/samchuks/assets/uploads/events/<filename>`. Ensure that directory is writable by PHP and publicly serves images.
+   Seed records keep portable relative paths such as `assets/img/new/orph.jpeg`; the pages resolve them to `https://samchuksfoundation.com/assets/img/new/orph.jpeg`. New admin uploads are written by PHP to `<API-project-root>/assets/uploads/events/` and their returned relative paths resolve to `https://api.leadstar.com.ng/samchuks/assets/uploads/events/<filename>`. When the PHP endpoint files are deployed in an `api` subfolder, the project root is its parent; when deployed directly in `/samchuks/`, that directory is the project root. Ensure the resulting uploads directory is writable by PHP and publicly serves images.
 
 3. In the API host's `api/config.local.php`, set `cors_origins` to the exact origin(s) of the public site and admin UI. Include scheme and port if non-default; do not include a path or trailing slash:
 
@@ -44,7 +44,9 @@ By default, the frontend uses the same-origin API path. To host the API separate
 
 4. Keep the API on HTTPS. If the admin frontend and API are on different sites (not just different subdomains of the same site), set `'session_samesite' => 'None'` in the API config. This requires HTTPS; same-site deployments should retain the more restrictive `'Strict'` default. Browser third-party-cookie restrictions may still prevent admin sessions across unrelated domains, so hosting the admin UI and API on the same site is recommended.
 
-The admin API uses credentialed session cookies and CSRF tokens for changes. On a deployed site, use HTTPS, a dedicated MySQL account with access only to this database, and configure PHP upload limits to at least 5 MB.
+The admin API uses credentialed session cookies and CSRF tokens for changes. Image uploads require PHP GD with WebP support. JPEG, PNG, and WebP uploads are fitted onto a white 1600 x 1200 canvas without cropping or enlarging smaller images, then saved as WebP at quality 82. This usually reduces file size substantially while maintaining good visual quality; exact savings depend on the source image. Each event is limited to 4 distinct images total, including its cover. On a deployed site, use HTTPS, a dedicated MySQL account with access only to this database, and configure PHP upload limits to at least 5 MB.
+
+Public event listings put the most recently updated published event first. Publishing a draft updates its timestamp, moving it to the top of the list.
 
 ## Endpoints
 
@@ -55,4 +57,4 @@ The admin API uses credentialed session cookies and CSRF tokens for changes. On 
 - `POST /api/auth.php` — admin login; accepts JSON `{ "email": "...", "password": "..." }`.
 - `DELETE /api/auth.php` — admin logout; requires the `X-CSRF-Token` header.
 - `GET|POST|PUT|DELETE /api/admin-events.php` — admin event management; writes require `X-CSRF-Token`.
-- `POST /api/upload.php` — upload up to 10 JPEG, PNG, WebP, or GIF images (5 MB each); requires admin session and CSRF token.
+- `POST /api/upload.php` — upload up to 4 JPEG, PNG, or WebP images (5 MB each); images are resized and converted to WebP; requires admin session and CSRF token.

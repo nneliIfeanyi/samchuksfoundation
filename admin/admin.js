@@ -7,8 +7,10 @@
   const loginForm = document.querySelector("#login-form");
   const eventForm = document.querySelector("#event-form");
   const eventDialog = document.querySelector("#event-dialog");
+  const previewDialog = document.querySelector("#preview-dialog");
   const tableBody = document.querySelector("#events-table-body");
   const toastRegion = document.querySelector("#toast-region");
+  const maxEventImages = 4;
   let csrfToken = "";
   let events = [];
 
@@ -120,6 +122,48 @@
     return event.programme_year || "Not specified";
   }
 
+  function eventImageUrl(path) {
+    const baseUrl = path.startsWith("assets/uploads/events/")
+      ? window.EVENTS_UPLOADS_BASE_URL
+      : window.EVENTS_ASSETS_BASE_URL;
+    return new URL(path, baseUrl).href;
+  }
+
+  function eventImagePaths(event) {
+    return [...new Set([event.cover_image, ...(event.gallery || [])].filter(Boolean))];
+  }
+
+  function currentImagePaths() {
+    const coverPath = document.querySelector("#cover-image").value.trim();
+    const galleryPaths = document.querySelector("#gallery").value
+      .split(/\r?\n/)
+      .map((path) => path.trim())
+      .filter(Boolean);
+    return [...new Set([coverPath, ...galleryPaths].filter(Boolean))];
+  }
+
+  function updateImageCountStatus() {
+    const count = currentImagePaths().length;
+    const countStatus = document.querySelector("#image-count-status");
+    const uploadButton = document.querySelector("#upload-button");
+    countStatus.textContent = count >= maxEventImages
+      ? `${count} of ${maxEventImages} images selected. Remove an image to upload another.`
+      : `${count} of ${maxEventImages} images selected.`;
+    countStatus.classList.toggle("image-count-limit", count >= maxEventImages);
+    uploadButton.disabled = count >= maxEventImages;
+  }
+
+  function showImageLoadFailure(image) {
+    const placeholder = document.createElement("span");
+    placeholder.className = "preview-image-placeholder";
+    const icon = document.createElement("i");
+    icon.className = "bi bi-image";
+    const text = document.createElement("span");
+    text.textContent = "Image could not be loaded";
+    placeholder.append(icon, text);
+    image.replaceWith(placeholder);
+  }
+
   function renderEventRow(event) {
     const row = document.createElement("tr");
     const nameCell = createCell();
@@ -129,10 +173,7 @@
     if (event.cover_image) {
       const image = document.createElement("img");
       image.className = "event-thumb";
-      const imageBaseUrl = event.cover_image.startsWith("assets/uploads/events/")
-        ? window.EVENTS_UPLOADS_BASE_URL
-        : window.EVENTS_ASSETS_BASE_URL;
-      image.src = new URL(event.cover_image, imageBaseUrl).href;
+      image.src = eventImageUrl(event.cover_image);
       image.alt = "";
       image.loading = "lazy";
       image.addEventListener("error", () => {
@@ -197,6 +238,7 @@
     const actions = document.createElement("div");
     actions.className = "row-actions";
     actions.append(
+      createActionButton("bi-eye", "Preview event", "", () => openPreview(event)),
       createActionButton("bi-pencil", "Edit event", "", () => openEditor(event)),
       createActionButton("bi-trash3", "Delete event", "delete", () => deleteEvent(event))
     );
@@ -285,7 +327,122 @@
     } else {
       clearForm();
     }
+    renderImageEditorPreview();
     if (!eventDialog.open) eventDialog.showModal();
+  }
+
+  function renderImageEditorPreview() {
+    const grid = document.querySelector("#image-preview-grid");
+    const coverPath = document.querySelector("#cover-image").value.trim();
+    const galleryPaths = document.querySelector("#gallery").value
+      .split(/\r?\n/)
+      .map((path) => path.trim())
+      .filter(Boolean);
+    const paths = [...new Set([coverPath, ...galleryPaths].filter(Boolean))];
+    updateImageCountStatus();
+    grid.replaceChildren();
+
+    if (!paths.length) {
+      const empty = document.createElement("p");
+      empty.className = "image-preview-empty";
+      empty.textContent = "Uploaded or saved images will appear here.";
+      grid.appendChild(empty);
+      return;
+    }
+
+    paths.forEach((path) => {
+      const card = document.createElement("figure");
+      card.className = "image-preview-card";
+      const image = document.createElement("img");
+      image.src = eventImageUrl(path);
+      image.alt = document.querySelector("#title").value.trim() || "Event image";
+      image.loading = "lazy";
+      image.addEventListener("error", () => showImageLoadFailure(image), { once: true });
+
+      const caption = document.createElement("figcaption");
+      const kind = document.createElement("span");
+      kind.className = "image-preview-kind";
+      const isCover = path === coverPath;
+      kind.textContent = isCover ? "Cover image" : "Gallery image";
+      const remove = document.createElement("button");
+      remove.className = "image-preview-remove";
+      remove.type = "button";
+      remove.textContent = "Remove";
+      remove.setAttribute("aria-label", `Remove ${isCover ? "cover" : "gallery"} image`);
+      remove.addEventListener("click", () => {
+        if (coverPath === path) document.querySelector("#cover-image").value = "";
+        document.querySelector("#gallery").value = galleryPaths.filter((galleryPath) => galleryPath !== path).join("\n");
+        renderImageEditorPreview();
+      });
+
+      caption.append(kind, remove);
+      card.append(image, caption);
+      grid.appendChild(card);
+    });
+  }
+
+  function openPreview(event) {
+    document.querySelector("#preview-heading").textContent = event.title;
+    const status = document.querySelector("#preview-status");
+    status.className = `status-pill status-${event.status}`;
+    status.textContent = event.status === "draft" ? "Draft — admin preview" : "Published event preview";
+
+    const content = document.querySelector("#event-preview-content");
+    content.replaceChildren();
+
+    const paths = eventImagePaths(event);
+    if (paths.length) {
+      const gallery = document.createElement("div");
+      gallery.className = "event-preview-gallery";
+      paths.forEach((path) => {
+        const image = document.createElement("img");
+        image.src = eventImageUrl(path);
+        image.alt = event.title;
+        image.loading = "lazy";
+        image.addEventListener("error", () => showImageLoadFailure(image), { once: true });
+        gallery.appendChild(image);
+      });
+      content.appendChild(gallery);
+    } else {
+      const empty = document.createElement("p");
+      empty.className = "image-preview-empty";
+      empty.textContent = "No images have been added to this event.";
+      content.appendChild(empty);
+    }
+
+    const details = document.createElement("section");
+    details.className = "event-preview-details";
+    const category = document.createElement("p");
+    category.className = "event-preview-category";
+    category.textContent = event.category;
+    const title = document.createElement("h3");
+    title.textContent = event.title;
+    details.append(category, title);
+
+    const facts = [
+      ["Date", event.event_date || event.programme_year],
+      ["Participants", event.participants],
+      ["Duration", event.duration]
+    ].filter(([, value]) => value);
+    if (facts.length) {
+      const list = document.createElement("ul");
+      facts.forEach(([label, value]) => {
+        const item = document.createElement("li");
+        const strong = document.createElement("strong");
+        strong.textContent = `${label}: `;
+        item.append(strong, document.createTextNode(value));
+        list.appendChild(item);
+      });
+      details.appendChild(list);
+    }
+
+    const description = document.createElement("p");
+    description.className = "event-preview-description";
+    description.textContent = event.description;
+    details.appendChild(description);
+    content.appendChild(details);
+
+    if (!previewDialog.open) previewDialog.showModal();
   }
 
   function clearForm() {
@@ -294,6 +451,7 @@
     document.querySelector("#slug").removeAttribute("data-edited");
     document.querySelector("#form-heading").textContent = "Create an event";
     document.querySelector("#save-event-button span").textContent = "Save event";
+    renderImageEditorPreview();
   }
 
   async function deleteEvent(event) {
@@ -358,6 +516,12 @@
     if (event.target === eventDialog) eventDialog.close();
   });
   eventDialog.addEventListener("close", clearForm);
+  document.querySelector("#close-preview-button").addEventListener("click", () => previewDialog.close());
+  previewDialog.addEventListener("click", (event) => {
+    if (event.target === previewDialog) previewDialog.close();
+  });
+  document.querySelector("#cover-image").addEventListener("input", renderImageEditorPreview);
+  document.querySelector("#gallery").addEventListener("input", renderImageEditorPreview);
 
   document.querySelector("#title").addEventListener("input", (event) => {
     const slugInput = document.querySelector("#slug");
@@ -372,6 +536,10 @@
 
   eventForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (currentImagePaths().length > maxEventImages) {
+      showToast(`Each event can have no more than ${maxEventImages} images, including the cover.`, "error");
+      return;
+    }
     const id = document.querySelector("#event-id").value;
     const saveButton = document.querySelector("#save-event-button");
     const payload = {
@@ -412,6 +580,11 @@
       showToast("Choose one or more images to upload.", "info");
       return;
     }
+    const remainingSlots = Math.max(0, maxEventImages - currentImagePaths().length);
+    if (files.length > remainingSlots) {
+      showToast(`You can upload no more than ${remainingSlots} additional image${remainingSlots === 1 ? "" : "s"}.`, "error");
+      return;
+    }
     const formData = new FormData();
     Array.from(files).forEach((file) => formData.append("images[]", file));
     button.disabled = true;
@@ -423,11 +596,12 @@
         document.querySelector("#cover-image").value = result.images[0];
       }
       document.querySelector("#image-upload").value = "";
+      renderImageEditorPreview();
       showToast("Images uploaded. Save the event to apply them.");
     } catch (error) {
       showToast(error.message, "error");
     } finally {
-      button.disabled = false;
+      button.disabled = currentImagePaths().length >= maxEventImages;
     }
   });
 
