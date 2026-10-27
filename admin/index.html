@@ -226,9 +226,13 @@
             <label class="form-label" for="image-upload">Upload images</label>
             <div class="upload-row">
               <input class="form-control" id="image-upload" type="file" accept="image/jpeg,image/png,image/webp" multiple>
-              <button id="upload-button" class="btn btn-light upload-button" type="button"><i class="bi bi-cloud-arrow-up"></i><span>Upload</span></button>
+              <button id="upload-button" class="btn btn-light upload-button" type="button">
+                <i class="bi bi-cloud-arrow-up button-icon"></i>
+                <span id="upload-button-label" class="button-label">Upload</span>
+                <span class="button-loading-spinner button-spinner d-none" aria-hidden="true"></span>
+              </button>
             </div>
-            <div class="form-hint">JPEG, PNG, or WebP. Maximum 5 MB each; saved as 1600 x 1200 WebP images.</div>
+            <div class="form-hint">JPEG, PNG, or WebP. Maximum 5 MB each; center-cropped to fill 1600 x 1200 WebP images.</div>
             <div id="image-preview-grid" class="image-preview-grid" aria-live="polite"></div>
             <div id="image-count-status" class="form-hint" aria-live="polite"></div>
           </div>
@@ -251,7 +255,11 @@
       </div>
       <div class="dialog-footer">
         <button id="cancel-event-button" class="btn btn-light" type="button">Cancel</button>
-        <button id="save-event-button" class="btn btn-primary save-event-button" type="submit"><i class="bi bi-check2"></i><span>Save event</span></button>
+        <button id="save-event-button" class="btn btn-primary save-event-button" type="submit">
+          <i class="bi bi-check2 button-icon"></i>
+          <span id="save-event-label" class="button-label">Save event</span>
+          <span class="button-loading-spinner button-spinner d-none" aria-hidden="true"></span>
+        </button>
       </div>
     </form>
   </dialog>

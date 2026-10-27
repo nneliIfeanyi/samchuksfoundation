@@ -62,9 +62,20 @@ foreach ($names as $index => $originalName) {
 
     $sourceWidth = imagesx($source);
     $sourceHeight = imagesy($source);
-    $scale = min($canvasWidth / $sourceWidth, $canvasHeight / $sourceHeight, 1);
-    $scaledWidth = max(1, (int)round($sourceWidth * $scale));
-    $scaledHeight = max(1, (int)round($sourceHeight * $scale));
+    $canvasAspect = $canvasWidth / $canvasHeight;
+    $sourceAspect = $sourceWidth / $sourceHeight;
+    $sourceX = 0;
+    $sourceY = 0;
+    $cropWidth = $sourceWidth;
+    $cropHeight = $sourceHeight;
+    if ($sourceAspect > $canvasAspect) {
+        $cropWidth = max(1, (int)round($sourceHeight * $canvasAspect));
+        $sourceX = intdiv($sourceWidth - $cropWidth, 2);
+    } else {
+        $cropHeight = max(1, (int)round($sourceWidth / $canvasAspect));
+        $sourceY = intdiv($sourceHeight - $cropHeight, 2);
+    }
+
     $canvas = imagecreatetruecolor($canvasWidth, $canvasHeight);
     if ($canvas === false) {
         imagedestroy($source);
@@ -77,19 +88,18 @@ foreach ($names as $index => $originalName) {
         imagedestroy($canvas);
         json_response(['error' => 'The server could not prepare the image background.'], 500);
     }
-    $offsetX = intdiv($canvasWidth - $scaledWidth, 2);
-    $offsetY = intdiv($canvasHeight - $scaledHeight, 2);
+
     if (!imagecopyresampled(
         $canvas,
         $source,
-        $offsetX,
-        $offsetY,
         0,
         0,
-        $scaledWidth,
-        $scaledHeight,
-        $sourceWidth,
-        $sourceHeight
+        $sourceX,
+        $sourceY,
+        $canvasWidth,
+        $canvasHeight,
+        $cropWidth,
+        $cropHeight
     )) {
         imagedestroy($source);
         imagedestroy($canvas);

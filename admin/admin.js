@@ -56,6 +56,19 @@
     window.setTimeout(() => toast.remove(), 220);
   }
 
+  function setActionButtonLoading(button, isLoading, label, disabledWhenIdle = false) {
+    button.querySelector(".button-label").textContent = label;
+    button.querySelector(".button-icon").classList.toggle("d-none", isLoading);
+    button.querySelector(".button-spinner").classList.toggle("d-none", !isLoading);
+    if (isLoading) {
+      button.disabled = true;
+      button.setAttribute("aria-busy", "true");
+    } else {
+      button.disabled = disabledWhenIdle;
+      button.removeAttribute("aria-busy");
+    }
+  }
+
   async function apiRequest(name, options = {}) {
     const headers = new Headers(options.headers || {});
     headers.set("Accept", "application/json");
@@ -150,7 +163,7 @@
       ? `${count} of ${maxEventImages} images selected. Remove an image to upload another.`
       : `${count} of ${maxEventImages} images selected.`;
     countStatus.classList.toggle("image-count-limit", count >= maxEventImages);
-    uploadButton.disabled = count >= maxEventImages;
+    uploadButton.disabled = count >= maxEventImages || uploadButton.getAttribute("aria-busy") === "true";
   }
 
   function showImageLoadFailure(image) {
@@ -309,7 +322,7 @@
   function openEditor(event) {
     if (event) {
       document.querySelector("#form-heading").textContent = "Edit event";
-      document.querySelector("#save-event-button span").textContent = "Save changes";
+      document.querySelector("#save-event-label").textContent = "Save changes";
       document.querySelector("#event-id").value = event.id;
       document.querySelector("#title").value = event.title;
       document.querySelector("#slug").value = event.slug;
@@ -450,7 +463,7 @@
     document.querySelector("#event-id").value = "";
     document.querySelector("#slug").removeAttribute("data-edited");
     document.querySelector("#form-heading").textContent = "Create an event";
-    document.querySelector("#save-event-button span").textContent = "Save event";
+    document.querySelector("#save-event-label").textContent = "Save event";
     renderImageEditorPreview();
   }
 
@@ -557,7 +570,8 @@
       featured: document.querySelector("#featured").checked
     };
 
-    saveButton.disabled = true;
+    const idleLabel = id ? "Save changes" : "Save event";
+    setActionButtonLoading(saveButton, true, id ? "Saving changes..." : "Saving event...");
     try {
       await apiRequest(id ? `admin-events.php?id=${encodeURIComponent(id)}` : "admin-events.php", {
         method: id ? "PUT" : "POST",
@@ -569,7 +583,7 @@
     } catch (error) {
       showToast(error.message, "error");
     } finally {
-      saveButton.disabled = false;
+      setActionButtonLoading(saveButton, false, eventDialog.open ? idleLabel : "Save event");
     }
   });
 
@@ -587,7 +601,7 @@
     }
     const formData = new FormData();
     Array.from(files).forEach((file) => formData.append("images[]", file));
-    button.disabled = true;
+    setActionButtonLoading(button, true, "Uploading...");
     try {
       const result = await apiRequest("upload.php", { method: "POST", body: formData });
       const gallery = document.querySelector("#gallery");
@@ -601,7 +615,12 @@
     } catch (error) {
       showToast(error.message, "error");
     } finally {
-      button.disabled = currentImagePaths().length >= maxEventImages;
+      setActionButtonLoading(
+        button,
+        false,
+        "Upload",
+        currentImagePaths().length >= maxEventImages
+      );
     }
   });
 
